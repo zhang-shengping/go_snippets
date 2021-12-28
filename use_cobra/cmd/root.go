@@ -11,6 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var Verbose bool
+var Source string
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "use_cobra",
@@ -24,6 +27,16 @@ to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
+		toggle, _ := cmd.Flags().GetBool("toggle")
+		fmt.Println("toggle is ", toggle)
+		verbose, _ := cmd.PersistentFlags().GetBool("verbose")
+		fmt.Println("Root cmd verbose is ", verbose)
+		source, err := cmd.PersistentFlags().GetString("source")
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("Root cmd Source is ", source)
+		// fmt.Println(Source)
 	},
 }
 
@@ -48,6 +61,11 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.MarkFlagRequired("toggle")
+	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+	rootCmd.PersistentFlags().StringVarP(&Source, "source", "s", "", "Source directory to read from")
+	// rootCmd.MarkFlagRequired("source")
+	rootCmd.MarkPersistentFlagRequired("source")
 }
 
 func initConfig() {

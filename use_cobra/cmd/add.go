@@ -11,6 +11,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var TEST string
+
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
@@ -23,12 +25,21 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("add called, add a int")
+		verbose, _ := cmd.Parent().PersistentFlags().GetBool("verbose")
+		fmt.Println("Sub cmd verbose is ", verbose)
+		source, err := cmd.Parent().PersistentFlags().GetString("source")
+		if err != nil {
+			fmt.Println("sub", err)
+		}
+		fmt.Println("Sub cmd Source is ", source)
 		fstatus, _ := cmd.Flags().GetBool("float")
 		if fstatus {
 			addFloat(args)
 		} else {
 			addInt(args)
 		}
+		test, _ := cmd.PersistentFlags().GetString("test")
+		fmt.Println("Sub cmd Test is ", test)
 	},
 }
 
@@ -38,6 +49,8 @@ func init() {
 	rootCmd.AddCommand(addCmd)
 	// local flag
 	addCmd.Flags().BoolP("float", "f", false, "Add Floating Numbers")
+	addCmd.PersistentFlags().StringVarP(&TEST, "test", "t", "", "TEST directory to read from")
+	addCmd.MarkPersistentFlagRequired("test")
 
 	// Here you will define your flags and configuration settings.
 
@@ -45,7 +58,7 @@ func init() {
 	// and all subcommands, e.g.:
 	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	// Cobra supports local flags which will only run when this command
+	// Cobra supports local flags which w -v -s pzhangill only run when this command
 	// is called directly, e.g.:
 	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
@@ -65,7 +78,7 @@ func addInt(args []string) {
 		}
 		sum = sum + itemp
 	}
-	fmt.Printf("Addition of numbers %s is %d", args, sum)
+	fmt.Printf("Addition of numbers %s is %d\n", args, sum)
 }
 
 func addFloat(args []string) {
@@ -78,5 +91,5 @@ func addFloat(args []string) {
 		}
 		sum = sum + ftemp
 	}
-	fmt.Printf("Sum of floating numbers %s is %f", args, sum)
+	fmt.Printf("Sum of floating numbers %s is %f\n", args, sum)
 }
