@@ -7,14 +7,14 @@ import (
 	"time"
 
 	// like a util package
-	corev1 "k8s.io/api/core/v1"
+    corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/runtime"
+	// "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/cache"
+    "k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -66,29 +66,32 @@ func main() {
 	pods := podinformer.Lister().Pods("default")
 	fmt.Println("Pods are: ", pods)
 
-	informer := informerfactory.Core().V1().Pods().Informer()
-	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			pod := obj.(corev1.Pod)
-			fmt.Printf("AddFunc is called, Pod is created %+v\n", pod)
-		},
-		DeleteFunc: func(obj interface{}) {
-			pod := obj.(corev1.Pod)
-			fmt.Printf("DeleteFunc is called, Pod is deleted %+v\n", pod)
-		},
-		UpdateFunc: func(oldObj interface{}, newObj interface{}) {
-			oldPod := oldObj.(corev1.Pod)
-			newPod := newObj.(corev1.Pod)
-			fmt.Printf("UpdateFunc is called, Old Pod is %+v, New Pod is %+v\n", oldPod, newPod)
-		},
-	})
+    informer := informerfactory.Core().V1().Pods().Informer()
+    informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+        AddFunc: func(obj interface{}) {
+            pod := obj.(*corev1.Pod)
+            fmt.Printf("AddFunc is called, Pod is created %+v\n", pod)
+        },
+        DeleteFunc: func(obj interface{}) {
+            pod := obj.(*corev1.Pod)
+            fmt.Printf("DeleteFunc is called, Pod is deleted %+v\n", pod)
+        },
+        UpdateFunc: func(oldObj interface{}, newObj interface{}) {
+            oldPod := oldObj.(*corev1.Pod)
+            newPod := newObj.(*corev1.Pod)
+            fmt.Printf("UpdateFunc is called, Old Pod is %+v, New Pod is %+v\n", oldPod, newPod)
+        },
+    })
+
+    <-wait.NeverStop
 
 	// Create a channel to stops the shared informer gracefully
-	stopper := make(chan struct{})
-	defer close(stopper)
-	defer runtime.HandleCrash()
+	// stopper := make(chan struct{})
+	// defer close(stopper)
+    // defer runtime.HandleCrash()
 
-	go informer.Run(stopper)
+	// go informer.Run(stopper)
+
 
 	// podinformer.Informer().AddEventHandler(
 	// 	cache.ResourceEventHandlerFuncs{
