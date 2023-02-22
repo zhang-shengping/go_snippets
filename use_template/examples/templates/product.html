@@ -1,0 +1,63 @@
+{{ template "header" .}}
+<h1>{{.Name}}</h1>
+<p>{{.Description}}</p>
+<p>Price : <strong>{{.Price}}</strong> $</p>
+<p>Shipping Date : {{.ShippingDate.Format "2006-01-02"}}</p>
+<h2>Delivery options</h2>
+<ul>
+    <li>Express + 2$ </li>
+    <li>Ultra Express + 5$</li>
+    <li>Normal</li>
+</ul>
+
+<h2> Proudct Functions</h2>
+
+# notice Foo, Bar method do not need a 'call' action
+<p>{{ .Foo }}</p>
+<p>{{ .Bar "lol" }}</p>
+
+# notice .MyFunc function need a 'call' action
+<p>{{call .MyFunc "first" "second"}}</p>
+
+{{ if and .Sale .SaleImagePath }}
+{{ .Sale }}
+{{ .SaleImagePath }}
+{{ end }}
+<p>{{capitalizeFirstLetter "test"}}</p>
+# 'action define template' can not be Execute and print out
+{{ template "footer" .}}
+
+{{ if .Sale }}
+Exclusive Sale Today
+{{ else }}
+Not in Sale
+{{ end }}
+
+{{ if eq .Price  100.00 }}
+    Only 100$
+{{ else }}
+    Give yourself a treat
+{{ end }}
+
+# Iteration
+<ul>
+    {{range $index, $element := .ShippingOptions}}
+       <li>{{ $element }}</li>
+    {{end}}
+</ul>
+
+<ul>
+    {{range $index, $element := .ShippingOptions}}
+       <li>{{ . }}</li>
+    {{end}}
+</ul>
+
+#  Get the value defined at a specific index
+{{ $firstDelOpt := index .ShippingOptions 0}}
+<p>First delivery option is {{ $firstDelOpt }}</p>
+
+
+
+# Debugging a template
+# This will output (in a human-readable mode) the properties keys and values passed to the template engine.
+{{ printf "%#v" . }}
